@@ -3,216 +3,401 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> STC ANIME WORLD</title>
+    <title>STC ANIME WORLD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
+        /* General Body Style */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #111827;
+            color: #f3f4f6;
         }
-        .header-bg {
-            background-color: rgba(17, 24, 39, 0.8);
-            backdrop-filter: blur(10px);
+        
+        /* Layout styles */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: space-between;
         }
-        .video-player-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            background-color: #000;
-        }
-        .video-player-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
+
+        .ad-container {
+            padding: 1rem;
+            text-align: center;
+            max-width: 332px; /* Controls ad width */
             width: 100%;
-            height: 100%;
+            margin: 0 auto;
         }
-        .server-btn, .episode-btn, .download-btn {
-            transition: background-color 0.3s ease, transform 0.2s ease;
+
+        .locker-main-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .server-btn:hover, .episode-btn:hover, .download-btn:hover {
-            transform: translateY(-2px);
+
+        /* --- Content Locker Styles --- */
+        .modal-content {
+            background-color: #1e293b;
+            border-radius: 16px;
+            padding: 35px;
+            width: 100%;
+            max-width: 500px; /* Controls locker width */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            text-align: center;
         }
-        .server-btn.active, .episode-btn.active {
-             background-color: #4f46e5;
-             color: white;
-             font-weight: 600;
+        .modal-header h3 { margin: 0; font-size: 20px; font-weight: 500; color: #f3f4f6; }
+        .modal-header p { margin: 4px 0 24px; font-size: 14px; color: #9ca3af; }
+        .actions { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .action-btn {
+            background-color: #DC2626;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+            width: 100% !important; /* Makes buttons full width */
         }
+        .action-btn:hover { background-color: #B91C1C; }
+        .action-btn.completed { background-color: #7F1D1D; cursor: not-allowed; opacity: 0.8; }
+        .action-btn.processing { cursor: wait; background-color: #991B1B; }
+        .action-btn.disabled-action {
+            background-color: #71717a;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .action-btn.disabled-action:hover {
+            background-color: #71717a;
+        }
+        #progress-text { font-size: 12px; color: #9ca3af; display: block; margin-bottom: 8px; text-align: left; }
+        .progress-bar-container { width: 100%; background-color: #4b5563; border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 24px; }
+        .progress-bar { width: 0%; height: 100%; background-color: #DC2626; border-radius: 4px; transition: width 0.4s ease-in-out; }
+        #unlock-button { background-color: #4b5563; color: #9ca3af; border: none; border-radius: 8px; padding: 14px; width: 100%; font-size: 16px; font-weight: 500; cursor: not-allowed; transition: background-color 0.3s ease, color 0.3s ease; }
+        #unlock-button:not(.disabled) { background-color: #DC2626; color: #ffffff; cursor: pointer; }
+        #unlock-button:not(.disabled):hover { background-color: #B91C1C; }
+
+        /* --- Anime Player Styles --- */
+        .video-player-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background-color: #000; }
+        .video-player-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .server-btn, .episode-btn, .download-btn { transition: background-color 0.3s ease, transform 0.2s ease; }
+        .server-btn:hover, .episode-btn:hover, .download-btn:hover { transform: translateY(-2px); }
+        .server-btn.active, .episode-btn.active { background-color: #4f46e5; color: white; font-weight: 600; }
     </style>
 </head>
-<body class="text-gray-300">
 
-    <header class="header-bg sticky top-0 z-50">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <a href="https://www.stcanimeworld.free.nf/" class="text-2xl sm:text-3xl font-bold text-white">
-                    STC <span class="text-indigo-400">ANIME WORLD</span>
-                </a>
-                <nav class="hidden md:flex items-center space-x-6">
-                    </nav>
-                <div>
-                    <a href="https://t.me/stcanimeworld" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-full text-sm inline-flex items-center">
-                        <i class="fab fa-telegram-plane text-base"></i>
-                        <span class="hidden sm:inline ml-2">Join Telegram</span>
-                    </a>
+<body>
+
+    <div id="locker-page" class="main-container">
+        <header class="ad-container">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'bd5ac0fef769a3cf5848a88b875da862',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//tabloidincapable.com/bd5ac0fef769a3cf5848a88b875da862/invoke.js"></script>
+        </header>
+
+        <main class="locker-main-content">
+            <div id="content-locker">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>STC ANIME WORLD</h3>
+                        <p>Complete the actions to unlock.</p>
+                    </div>
+                    <div class="actions">
+                        <a href="https://tabloidincapable.com/vqqk2dr8ja?key=3b8088ec85da8f867938daea71c8b069" target="_blank" class="action-btn"><i class="fas fa-link"></i> Ads 1</a>
+                        <a href="https://tabloidincapable.com/ymqb5itcbq?key=b9d50b63556479c0b7714ce85408ac4f" target="_blank" class="action-btn"><i class="fas fa-link"></i> Ads 2</a>
+                    </div>
+                    <span id="progress-text">unlock progress: 0/2</span>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <button id="unlock-button" class="disabled w-full flex justify-center items-center gap-2">
+                        <i class="fas fa-lock"></i> Watch Now
+                    </button>
                 </div>
             </div>
-        </div>
-    </header>
+        </main>
 
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="lg:flex lg:space-x-8">
+        <footer class="ad-container">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'bd5ac0fef769a3cf5848a88b875da862',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//tabloidincapable.com/bd5ac0fef769a3cf5848a88b875da862/invoke.js"></script>
+        </footer>
+    </div>
 
-            <div class="lg:w-2/3">
-                <div class="text-left mb-2">
-                    <span class="text-white font-semibold text-sm">Clevatess Season 1</span>
-                </div>
 
-                <section class="mb-6">
-                    <div class="video-player-container rounded-lg shadow-lg">
-                        <iframe
-                            id="video-player"
-                            src=""
-                            title="Video player"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                </section>
-
-                <section class="bg-gray-800 rounded-lg p-4 md:p-6 mb-6">
-                    <p id="episode-indicator" class="text-indigo-400 font-semibold"></p>
-
-                    <div class="flex flex-wrap items-center gap-3 mt-4">
-                        <div id="server-buttons" class="flex flex-wrap gap-2"></div>
-
-                        <a id="download-button" href="#" target="_blank" rel="noopener noreferrer" class="download-btn bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm inline-flex items-center font-semibold">
-                            <i class="fas fa-download mr-2"></i>
-                            <span>Download</span>
+    <div id="main-content" style="display: none;" class="text-gray-300">
+        <header class="bg-slate-900 sticky top-0 z-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <a href="https://www.stcanimeworld.free.nf/" class="text-2xl sm:text-3xl font-bold text-white">
+                        STC <span class="text-indigo-400">ANIME WORLD</span>
+                    </a>
+                    <div>
+                        <a href="https://t.me/stcanimeworld" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full text-sm inline-flex items-center">
+                            <i class="fab fa-telegram-plane text-base"></i>
+                            <span class="hidden sm:inline ml-2">Join Telegram</span>
                         </a>
                     </div>
-                </section>
-            </div>
-
-            <aside class="lg:w-1/3 lg:mt-8">
-                <div class="bg-gray-800 rounded-lg p-4">
-                    <h2 class="text-xl font-bold text-white mb-4 border-b-2 border-gray-700 pb-2">Episodes</h2>
-                    <div class="max-h-96 overflow-y-auto pr-2">
-                        <div id="episode-list" class="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2">
-                            </div>
-                    </div>
                 </div>
-            </aside>
+            </div>
+        </header>
 
-        </div>
-    </main>
-    <script type="text/javascript">
-	atOptions = {
-		'key' : 'ec1219d13afc7279c51bd7d3a2c05ca8',
-		'format' : 'iframe',
-		'height' : 50,
-		'width' : 320,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//tabloidincapable.com/ec1219d13afc7279c51bd7d3a2c05ca8/invoke.js"></script>
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="lg:flex lg:space-x-8">
+                <div class="lg:w-2/3">
+                    <div class="text-left mb-2">
+                        <span class="text-white font-semibold text-sm">Sakamoto Days Season 1</span>
+                    </div>
+                    <section class="mb-6">
+                        <div class="video-player-container rounded-lg shadow-lg">
+                            <iframe id="video-player" src="" title="Video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </section>
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : 'ec1219d13afc7279c51bd7d3a2c05ca8',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//tabloidincapable.com/ec1219d13afc7279c51bd7d3a2c05ca8/invoke.js"></script>
+                    
+                    <section class="bg-gray-800 rounded-lg p-4 md:p-6 mb-6">
+                        <p id="episode-indicator" class="text-indigo-400 font-semibold"></p>
+                        <div class="flex flex-wrap items-center gap-3 mt-4">
+                            <div id="server-buttons" class="flex flex-wrap gap-2"></div>
+                            <a id="download-button" href="#" class="download-btn bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm inline-flex items-center font-semibold">
+                                <i class="fas fa-download mr-2"></i>
+                                <span>Download</span>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+                <aside class="lg:w-1/3 lg:mt-8">
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h2 class="text-xl font-bold text-white mb-4 border-b-2 border-gray-700 pb-2">Episodes</h2>
+                        <div class="max-h-96 overflow-y-auto pr-2">
+                            <div id="episode-list" class="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2"></div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
 
-<script type="text/javascript">
-	atOptions = {
-		'key' : 'c4715d0811d3b7ce071885c5b84c4112',
-		'format' : 'iframe',
-		'height' : 60,
-		'width' : 468,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//tabloidincapable.com/c4715d0811d3b7ce071885c5b84c4112/invoke.js"></script>
-
-    <footer class="bg-gray-900 border-t border-gray-800 mt-8">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-            <p class="text-gray-500 text-sm">&copy; 2025 STC ANIME WORLD. All Rights Reserved.</p>
-        </div>
-    </footer>
+        <footer class="bg-gray-900 border-t border-gray-800 mt-8">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+                <p class="text-gray-500 text-sm">&copy; 2025 STC ANIME WORLD. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const actionButtons = document.querySelectorAll('.action-btn');
+            const unlockButton = document.getElementById('unlock-button');
+            const progressText = document.getElementById('progress-text');
+            const progressBar = document.getElementById('progress-bar');
+            const lockerPage = document.getElementById('locker-page'); // Target the main locker page container
+            const mainContent = document.getElementById('main-content');
 
-            // --- সকল এপিসোডের তথ্য এখানে যোগ করুন ---
-            // আপনাকে শুধু এই 'episodesData' অ্যারে-টি এডিট করতে হবে।
+            const unlockStatusJSON = localStorage.getItem('unlockStatus');
+            if (unlockStatusJSON) {
+                const unlockStatus = JSON.parse(unlockStatusJSON);
+                const now = new Date();
+
+                if (now.getTime() < unlockStatus.expiresAt) {
+                    lockerPage.style.display = 'none'; // Hide the entire locker page
+                    mainContent.style.display = 'block';
+                    initializeAnimePlayer();
+                    return;
+                } else {
+                    localStorage.removeItem('unlockStatus');
+                }
+            }
+            
+            const totalActions = actionButtons.length;
+            let completedActions = 0;
+
+            actionButtons.forEach((btn, index) => {
+                if (index > 0) {
+                    btn.classList.add('disabled-action');
+                }
+            });
+
+            actionButtons.forEach((button, index) => {
+                button.addEventListener('click', (event) => {
+                    if (button.classList.contains('disabled-action') || button.classList.contains('completed') || button.classList.contains('processing')) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    button.classList.add('processing');
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Please wait...`;
+
+                    setTimeout(() => {
+                        button.classList.remove('processing');
+                        button.classList.add('completed');
+                        button.innerHTML = originalHTML;
+                        completedActions++;
+                        updateProgress();
+
+                        const nextButton = actionButtons[index + 1];
+                        if (nextButton) {
+                            nextButton.classList.remove('disabled-action');
+                        }
+                    }, 6000);
+                });
+            });
+
+            unlockButton.addEventListener('click', () => {
+                if (!unlockButton.classList.contains('disabled')) {
+                    lockerPage.style.display = 'none'; // Hide the entire locker page
+                    mainContent.style.display = 'block';
+                    
+                    const now = new Date();
+                    const unlockStatus = {
+                        unlocked: true,
+                        expiresAt: now.getTime() + (6 * 60 * 60 * 1000)
+                    };
+                    localStorage.setItem('unlockStatus', JSON.stringify(unlockStatus));
+                    
+                    initializeAnimePlayer();
+                }
+            });
+
+            function updateProgress() {
+                progressText.textContent = `unlock progress: ${completedActions}/${totalActions}`;
+                const progressPercentage = (completedActions / totalActions) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+
+                if (completedActions === totalActions) {
+                    unlockButton.classList.remove('disabled');
+                    const lockIcon = unlockButton.querySelector('i');
+                    lockIcon.classList.remove('fa-lock');
+                    lockIcon.classList.add('fa-lock-open');
+                }
+            }
+        });
+
+        function initializeAnimePlayer() {
             const episodesData = [
-                // নতুন এপিসোড যোগ করতে, নিচের ফরম্যাটটি কপি করে পেস্ট করুন এবং তথ্য পরিবর্তন করুন
                 {
-                    episode: 1, // এপিসোড নম্বর
+                    episode: 1, // 
                     servers: {
-                        'Server 1 (Rumble)': 'https://rumble.com/embed/v6vimtg/', // সার্ভারের নাম এবং লিঙ্ক
-                        'Server 2 (Ruby)': 'https://rubyvidhub.com/embed-cu358m9xrlos.html'
+                        'Server 1 (Rumble)': 'https://rumble.com/embed/v6whue2/', //
+                        'Server 2 (Ruby)': 'https://rubyvidhub.com/embed-734gg7xse77e.html'
                     },
-                    downloadLink: 'https://stcanimedownloader.blogspot.com/2025/08/download-clevatess-season-1-body.html' // এপিসোড ১ এর ডাউনলোড লিঙ্ক
+                    downloadLink: 'https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body.html' // 
+                },
+                   {
+                    episode: 2, // 
+                    servers: {
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whufq/ '
+                        'Server 2 (Ruby)': 'https://rubyvidhub.com/embed-19h0q60k0wp8.html'
+                    },
+                    downloadLink: 'https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_8.html' 
                 },
                  {
-                    episode: 2, // এপিসোড নম্বর
+                    episode: 3, // 
                     servers: {
-                        'Server 1 (Rumble)': 'https://rumble.com/embed/v6vr38m/',
-                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-3of4g1ptv98s.html'
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whui4/ '
+                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-bhrihcupecef.html '
                     },
-                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/08/download-clevatess-season-1-body_22.html' // এপিসোড ৩ এর ডাউনলোড লিঙ্ক
+                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_9.html ' // 
                 },
+                 {
+                    episode: 4, // 
+                    servers: {
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whuiu/ ', //
+                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-ujuy7izkw3r7.html '
+                    },
+                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_39.html ' // 
+                }, 
                 {
-                    episode: 3, // এপিসোড নম্বর
+                    episode: 5, // 
                     servers: {
-                        'Server 1 (Rumble)': 'https://rumble.com/embed/v6vr3c6/',
-                        'Server 2 (Ruby)': 'https://rubyvidhub.com/embed-offqhwcojv3r.html' // সার্ভারের নাম এবং লিঙ্ক
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whujm/ ', //
+                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-de3oxxmt2vus.html '
                     },
-                    downloadLink: 'https://stcanimedownloader.blogspot.com/2025/08/download-clevatess-season-1-body_67.html' // এপিসোড ২ এর ডাউনলোড লিঙ্ক
-                },
-               
-                  {
-                    episode: 4, // এপিসোড নম্বর
+                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_88.html ' // 
+                }, 
+                {
+                    episode: 6, // 
                     servers: {
-                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6vr3hq/',
-                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-j5to5825nf35.html'
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whuku/ ', //
+                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-c8dc2jxbxeai.html '
                     },
-                    downloadLink: 'https://stcanimedownloader.blogspot.com/2025/08/download-clevatess-season-1-body_16.html ' // এপিসোড ৩ এর ডাউনলোড লিঙ্ক
-                },
-                
-                 {
-                    episode: 5, // এপিসোড নম্বর
+                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_26.html ' // 
+                }, 
+                {
+                    episode: 7, // 
                     servers: {
-                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6vr3mo/',
-                        'Server 2 (Ruby)': 'https://rubyvidhub.com/embed-6eqdjryfo49t.html '
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whum8/?pub=2ohvc2 ', //
+                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-3wtemanwfq1v.html '
                     },
-                    downloadLink: 'https://stcanimedownloader.blogspot.com/2025/08/download-clevatess-season-1-body_24.html ' 
+                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_61.html ' // 
                 },
                  {
-                    episode: 6, 
+                    episode: 8, // 
                     servers: {
-                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6vr3q4/',
-                        'Server 2 (Ruby)': 'https://rubyvidhub.com/embed-qjrwnprao1wb.html '
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whun0/ ', //
+                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-i8dltv5nbdo1.html '
                     },
-                    downloadLink: 'https://stcanimedownloader.blogspot.com/2025/08/download-clevatess-season-1-body_74.html ' 
-                }, {
-                    episode: 7, 
-                    servers: {
-                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6vr3ts/',
-                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-u0e76dnyzdwc.html'
-                    },
-                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/08/download-clevatess-season-1-body_58.html' 
-                }, {
-                    episode: 8, 
-                    servers: {
-                        'Server 1 (Rumble)': 'https://rumble.com/embed/v6vr3wy/ ',
-                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-v78hd000bwhv.html'
-                    },
-                    downloadLink: 'https://stcanimedownloader.blogspot.com/2025/08/download-clevatess-season-1-body_75.html ' 
+                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_69.html ' // 
                 },
-                // ... এখানে নতুন এপিসোড যোগ করুন ...
+                 {
+                    episode: 9, // 
+                    servers: {
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whuns/ ', //
+                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-7o5zvu9hacjg.html '
+                    },
+                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_89.html ' // 
+                },
+                 {
+                    episode: 10, // 
+                    servers: {
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whup0/ ', //
+                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-3vfr4s3h3olv.html '
+                    },
+                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_42.html ' // 
+                },
+                 {
+                    episode: 11, // 
+                    servers: {
+                        'Server 1 (Rumble)': ' https://rumble.com/embed/v6whupq/ ', //
+                        'Server 2 (Ruby)': ' https://rubyvidhub.com/embed-mimpjuj4626w.html '
+                    },
+                    downloadLink: ' https://stcanimedownloader.blogspot.com/2025/09/download-sakamoto-days-season-1-body_16.html ' // 
+                },
             ];
-
-            // --- নিচের কোডে কোনো পরিবর্তনের প্রয়োজন নেই ---
 
             const videoPlayer = document.getElementById('video-player');
             const episodeIndicator = document.getElementById('episode-indicator');
@@ -225,11 +410,11 @@
                 if (!episodeData) return;
 
                 episodeIndicator.textContent = `You are watching Episode ${episodeData.episode}`;
-
+                
                 serverButtonsContainer.innerHTML = '';
                 let isFirstServer = true;
                 for (const serverName in episodeData.servers) {
-                    const serverUrl = episodeData.servers[serverName];
+                    const serverUrl = episodeData.servers[serverName].trim();
                     const button = document.createElement('button');
                     button.className = 'server-btn bg-gray-700 text-gray-300 py-2 px-4 rounded-md text-sm font-semibold';
                     button.textContent = serverName;
@@ -240,13 +425,13 @@
                         videoPlayer.src = serverUrl;
                         isFirstServer = false;
                     }
-
+                    
                     button.addEventListener('click', () => {
                         videoPlayer.src = button.dataset.src;
                         document.querySelectorAll('.server-btn').forEach(btn => btn.classList.remove('active'));
                         button.classList.add('active');
                     });
-
+                    
                     serverButtonsContainer.appendChild(button);
                 }
 
@@ -265,7 +450,7 @@
                 button.className = 'episode-btn bg-gray-700 text-gray-300 font-semibold py-2 rounded-md text-center';
                 button.textContent = epData.episode;
                 button.dataset.episode = epData.episode;
-
+                
                 button.addEventListener('click', () => {
                     loadEpisode(epData.episode);
                 });
@@ -276,15 +461,7 @@
             if (episodesData.length > 0) {
                 loadEpisode(episodesData[0].episode);
             }
-        });
+        }
     </script>
-
-    <script type="text/javascript" src="//tabloidincapable.com/044478bac56eb613662b93ef204db084/invoke.js" defer></script>
-    <script type='text/javascript' src='//tabloidincapable.com/55/e7/eb/55e7eb56a363eb4f7b6faa550191bf7c.js' defer></script>
-
-
 </body>
 </html>
-
-
-
